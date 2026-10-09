@@ -1,0 +1,67 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+body{
+  min-height: 100vh;
+  width: 100vw;
+  background:
+    radial-gradient(circle at 10% 15%, #0e084b 0, transparent 35%),
+    radial-gradient(circle at 90% 85%, #09356e 0, transparent 35%),
+    linear-gradient(135deg, #0b1b6d, #33248a 55%, #2f094b);
+}
+.intro {
+    min-height: 100vh;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+
+}
+
+.intro img {
+    width: 60%;
+    max-width: 650px;
+    min-width: 180px;
+}
+
+.intro p {
+  color: #f0edff;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+  opacity: 0.9;
+  text-align: center;
+  margin: 16px 0 28px;
+  text-shadow: 0 2px 12px rgba(20, 10, 80, 0.2);
+}
+
+.intro-buttons button{
+  font-family: "Google Sans", sans-serif;
+  background: none;
+  border-radius: 25px;
+  color: aliceblue;
+  cursor: pointer;
+  margin: 1em;
+  width: 10em;
+  height: 3em;
+  border: none;
+  font-size: 0.8rem;
+
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.intro-buttons button:hover{
+  background-color: rgb(201, 189, 21);
+  color: rgb(21, 54, 124);
+  transform: scale(1.1);
+  font-weight: bold;
+}
