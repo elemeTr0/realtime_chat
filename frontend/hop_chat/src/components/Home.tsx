@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "../supabase";
 import hopLogo from "../assets/HOPlogo.png";
@@ -43,10 +42,11 @@ function Home({ onLogout }: HomeProps) {
     const [isSearching, setIsSearching] = useState(false);
     const [isStartingChat, setIsStartingChat] = useState(false);
     const [isSending, setIsSending] = useState(false);
-    const [isLoadingConversations, setIsLoadingConversations] =
-        useState(true);
+    const [isLoadingConversations, setIsLoadingConversations] = useState(true);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     async function loadConversations() {
         setIsLoadingConversations(true);
@@ -63,11 +63,10 @@ function Home({ onLogout }: HomeProps) {
 
             setCurrentUserId(currentUser.id);
 
-            const { data: memberships, error: membershipError } =
-                await supabase
-                    .from("conversation_members")
-                    .select("conversation_id")
-                    .eq("user_id", currentUser.id);
+            const { data: memberships, error: membershipError } = await supabase
+                .from("conversation_members")
+                .select("conversation_id")
+                .eq("user_id", currentUser.id);
 
             if (membershipError) throw membershipError;
 
@@ -93,12 +92,11 @@ function Home({ onLogout }: HomeProps) {
 
             if (conversationError) throw conversationError;
 
-            const { data: memberData, error: memberError } =
-                await supabase
-                    .from("conversation_members")
-                    .select("conversation_id, user_id")
-                    .in("conversation_id", conversationIds)
-                    .neq("user_id", currentUser.id);
+            const { data: memberData, error: memberError } = await supabase
+                .from("conversation_members")
+                .select("conversation_id, user_id")
+                .in("conversation_id", conversationIds)
+                .neq("user_id", currentUser.id);
 
             if (memberError) throw memberError;
 
@@ -125,13 +123,10 @@ function Home({ onLogout }: HomeProps) {
                 ]),
             );
 
-            const conversationList: Conversation[] = (
-                conversationData ?? []
-            )
+            const conversationList: Conversation[] = (conversationData ?? [])
                 .map((conversation) => {
                     const otherMember = memberData?.find(
-                        (member) =>
-                            member.conversation_id === conversation.id,
+                        (member) => member.conversation_id === conversation.id,
                     );
 
                     if (!otherMember) return null;
@@ -171,62 +166,64 @@ function Home({ onLogout }: HomeProps) {
     }
 
     useEffect(() => {
-    async function initialize() {
-        await loadConversations();
-    }
-
-    void initialize();
-}, []);
-
-const selectedConversationId = selectedConversation?.id;
-
-useEffect(() => {
-    let isActive = true;
-
-    async function loadMessages() {
-        if (!selectedConversationId) {
-            setIsLoadingMessages(false);
-            return;
+        async function initialize() {
+            await loadConversations();
         }
 
-        setIsLoadingMessages(true);
+        void initialize();
+    }, []);
 
-        try {
-            const { data, error } = await supabase
-                .from("messages")
-                .select(
-                    "id, conversation_id, sender_id, content, created_at",
-                )
-                .eq("conversation_id", selectedConversationId)
-                .order("created_at", { ascending: true });
+    const selectedConversationId = selectedConversation?.id;
 
-            if (error) throw error;
+    useEffect(() => {
+        let isActive = true;
 
-            if (isActive) {
-                setMessages(data ?? []);
-                setMessageError("");
-            }
-        } catch (error) {
-            console.error("Failed to load messages:", error);
-
-            if (isActive) {
-                setMessageError(
-                    "Couldn't load messages. Please try again.",
-                );
-            }
-        } finally {
-            if (isActive) {
+        async function loadMessages() {
+            if (!selectedConversationId) {
                 setIsLoadingMessages(false);
+                return;
+            }
+
+            setIsLoadingMessages(true);
+
+            try {
+                const { data, error } = await supabase
+                    .from("messages")
+                    .select(
+                        "id, conversation_id, sender_id, content, created_at",
+                    )
+                    .eq("conversation_id", selectedConversationId)
+                    .order("created_at", { ascending: false })
+                    .order("id", { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                if (isActive) {
+                    setMessages((data ?? []).reverse());
+                    setMessageError("");
+                }
+            } catch (error) {
+                console.error("Failed to load messages:", error);
+
+                if (isActive) {
+                    setMessageError(
+                        "Couldn't load messages. Please try again.",
+                    );
+                }
+            } finally {
+                if (isActive) {
+                    setIsLoadingMessages(false);
+                }
             }
         }
-    }
 
-    void loadMessages();
+        void loadMessages();
 
-    return () => {
-        isActive = false;
-    };
-}, [selectedConversationId]);
+        return () => {
+            isActive = false;
+        };
+    }, [selectedConversationId]);
     async function searchUsers() {
         const username = search.trim();
 
@@ -326,10 +323,7 @@ useEffect(() => {
                 created_at: conversation.created_at,
             };
 
-            setConversations((previous) => [
-                newConversation,
-                ...previous,
-            ]);
+            setConversations((previous) => [newConversation, ...previous]);
             setSelectedConversation(newConversation);
             setUsers([]);
             setSearch("");
@@ -370,9 +364,7 @@ useEffect(() => {
                     sender_id: user.id,
                     content,
                 })
-                .select(
-                    "id, conversation_id, sender_id, content, created_at",
-                )
+                .select("id, conversation_id, sender_id, content, created_at")
                 .single();
 
             if (error) throw error;
@@ -381,9 +373,7 @@ useEffect(() => {
             setNewMessage("");
         } catch (error) {
             console.error("Failed to send message:", error);
-            setMessageError(
-                "Couldn't send your message. Please try again.",
-            );
+            setMessageError("Couldn't send your message. Please try again.");
         } finally {
             setIsSending(false);
         }
@@ -400,15 +390,17 @@ useEffect(() => {
         onLogout();
     }
 
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [messages]);
+
     return (
         <main className="messenger">
             <aside className="chat-sidebar">
                 <header className="sidebar-header">
-                    <img
-                        src={hopLogo}
-                        alt="HOP logo"
-                        className="hop-logo"
-                    />
+                    <img src={hopLogo} alt="HOP logo" className="hop-logo" />
                     <button type="button" onClick={handleLogout}>
                         Log out
                     </button>
@@ -432,9 +424,7 @@ useEffect(() => {
                     </button>
                 </form>
 
-                {searchError && (
-                    <p className="home-error">{searchError}</p>
-                )}
+                {searchError && <p className="home-error">{searchError}</p>}
 
                 {users.length > 0 && (
                     <section className="search-results">
@@ -559,16 +549,14 @@ useEffect(() => {
                                     </div>
                                 ))
                             )}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         {messageError && messages.length > 0 && (
                             <p className="home-error">{messageError}</p>
                         )}
 
-                        <form
-                            className="message-form"
-                            onSubmit={sendMessage}
-                        >
+                        <form className="message-form" onSubmit={sendMessage}>
                             <input
                                 type="text"
                                 placeholder="Write a message..."
@@ -592,9 +580,7 @@ useEffect(() => {
                     <div className="welcome-panel">
                         <img src={hopLogo} alt="HOP logo" />
                         <h1>Welcome to HOP!</h1>
-                        <p>
-                            Pick a conversation or search for someone new.
-                        </p>
+                        <p>Pick a conversation or search for someone new.</p>
                     </div>
                 )}
             </section>

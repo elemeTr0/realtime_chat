@@ -13,29 +13,42 @@ function Login({ onBack, onLogin }: LoginProps) {
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-
         setError("");
         setIsSubmitting(true);
 
         const formData = new FormData(event.currentTarget);
-
-        const email = (formData.get("email") as string).trim();
+        const username = (formData.get("username") as string).trim();
         const password = formData.get("password") as string;
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+            const response = await fetch("http://localhost:3000/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, password }),
             });
 
-            if (error) {
-                setError("Invalid email or password.");
+            const result = await response.json();
+
+            if (!response.ok) {
+                setError(result.error || "Invalid username or password.");
+                return;
+            }
+
+            const { error: sessionError } = await supabase.auth.setSession({
+                access_token: result.session.access_token,
+                refresh_token: result.session.refresh_token,
+            });
+
+            if (sessionError) {
+                setError("Login failed. Please try again.");
                 return;
             }
 
             onLogin();
         } catch {
-            setError("Something went wrong. Please try again.");
+            setError("Could not connect to the server. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
@@ -46,12 +59,12 @@ function Login({ onBack, onLogin }: LoginProps) {
             <h1>Log in to HOP</h1>
 
             <form onSubmit={handleSubmit}>
-                <label htmlFor="email">Email</label>
+                <label htmlFor="username">Username</label>
                 <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    autoComplete="email"
+                    id="username"
+                    type="text"
+                    name="username"
+                    autoComplete="username"
                     required
                 />
 

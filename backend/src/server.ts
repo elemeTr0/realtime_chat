@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+import authRouter from "./auth.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.get("/", (req, res) => {
     res.json({ message: "Hop App API is running" });
 });
 
+app.use("/auth", authRouter);
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

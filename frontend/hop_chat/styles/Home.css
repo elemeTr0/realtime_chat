@@ -22,8 +22,11 @@
     flex-shrink: 0;
     width: 340px;
     padding: 22px 16px;
-    background: #ffffff;
-    border-right: 1px solid #e8ddff;
+    background:
+    radial-gradient(circle at 10% 15%, #0e084b 0, transparent 35%),
+    radial-gradient(circle at 90% 85%, #04053d 0, transparent 35%),
+    linear-gradient(135deg, #050c31, #261292 55%, #2f094b);
+    /* border-right: 2px solid #000000; */
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -50,8 +53,8 @@
     border: none;
     border-radius: 10px;
     padding: 10px 14px;
-    background: linear-gradient(135deg, #7c3aed, #ec4899);
-    color: white;
+    background: linear-gradient(135deg, #cab125, #e2d51b);
+    color: rgb(23, 52, 214);
     font-weight: 700;
     cursor: pointer;
     transition: transform 0.2s, opacity 0.2s;
@@ -125,7 +128,7 @@
     border: none;
     border-radius: 12px;
     background: transparent;
-    color: #282044;
+    color: #ffffff;
     text-align: left;
     cursor: pointer;
     transition: background 0.2s;
@@ -133,11 +136,14 @@
 
 .conversation-item:hover,
 .person-result:hover {
-    background: #f3edff;
+    background: linear-gradient(135deg, #cab125, #e2d51b);
+    color: rgb(23, 52, 214);
 }
 
 .conversation-item.active {
-    background: linear-gradient(110deg, #eee5ff, #ffe7f4);
+    background: linear-gradient(110deg, #eee5ff65, #ffe7f456);
+    color: #ffffff;
+
 }
 
 .conversation-info {
@@ -203,15 +209,15 @@
     background:
         radial-gradient(
             ellipse at top right,
-            #f5dfff 0%,
+            #251c69 0%,
             transparent 45%
         ),
         radial-gradient(
             ellipse at bottom left,
-            #dbeafe 0%,
+            #23275a 0%,
             transparent 45%
         ),
-        #faf8ff;
+        #07031b;
 }
 
 .chat-header {
@@ -220,8 +226,8 @@
     align-items: center;
     gap: 14px;
     padding: 20px 28px;
-    background: #ffffffcc;
-    border-bottom: 1px solid #e8ddff;
+    background: #00000036;
+    color: white;
 }
 
 .chat-header h2 {
@@ -356,14 +362,14 @@
 
 .message-row.mine .message-bubble {
     border-bottom-right-radius: 5px;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, #726ab8, #353683);
     color: white;
 }
 
 .message-row.theirs .message-bubble {
     border: 1px solid #eee6ff;
     border-bottom-left-radius: 5px;
-    background: white;
+    background: rgb(233, 215, 215);
     color: #282044;
 }
 
@@ -382,8 +388,8 @@
     align-items: center;
     gap: 12px;
     padding: 16px 24px;
-    border-top: 1px solid #e8ddff;
-    background: #ffffffdd;
+    /* border-top: 2px solid #000000; */
+    background: #0d0f1a63;
 }
 
 .message-form input {

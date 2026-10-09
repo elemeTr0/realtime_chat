@@ -37,7 +37,6 @@ function Signup({ onBack }: SignupProps) {
         setIsSubmitting(true);
 
         try {
-            // Check username availability only after form submission.
             const { data: existingUser, error: checkError } = await supabase
                 .from("profiles")
                 .select("id")
